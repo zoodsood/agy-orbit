@@ -1,0 +1,78 @@
+name: Antigravity Orbit Multi-Surface CI/CD
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  analyze-and-test:
+    name: Analyze & Critical Path Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+          cache: true
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Static Code Analysis
+        run: flutter analyze --no-fatal-infos
+      - name: Run Critical Path Tests
+        run: flutter test test/core/ test/features/ test/widget_test.dart
+
+  build-android:
+    name: Build Android APK
+    needs: analyze-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+          cache: true
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Run Test Suite
+        run: flutter test test/core/ test/features/ test/widget_test.dart
+      - name: Build Release APK
+        run: flutter build apk --release
+      - name: Upload Android Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Orbit-Android-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+  build-windows:
+    name: Build Windows EXE
+    needs: analyze-and-test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+          cache: true
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Run Test Suite
+        run: flutter test test/core/ test/features/ test/widget_test.dart
+      - name: Build Windows Release Executable
+        run: flutter build windows --release
+      - name: Upload Windows Bundle (EXE + DLLs)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Orbit-Windows-Release
+          path: build/windows/x64/runner/Release/
