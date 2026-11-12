@@ -1,0 +1,31 @@
+{
+  "api": {
+    "controlPlaneBaseUrl": "https://generativelanguage.googleapis.com",
+    "dataPlaneBaseUrl": "https://generativelanguage.googleapis.com",
+    "apiVersion": "v1beta",
+    "memoryBankBaseUrl": "https://vertexai.googleapis.com",
+    "networkAllowlist": ["*"],
+    "requestTimeoutSeconds": 60,
+    "pollingIntervalSeconds": 3
+  },
+  "models": [
+    {
+      "id": "gemini-4-argon",
+      "displayName": "Gemini 4 Argon",
+      "description": "Deep reasoning, architecture design, and complex multi-file refactoring.",
+      "supportsReasoning": true,
+      "supportsFastCoding": false,
+      "maxContextTokens": 1000000,
+      "tags": ["reasoning", "deep-code", "recommended-planner"]
+    },
+    {
+      "id": "gemini-3.8-flash",
+      "displayName": "Gemini 3.8 Flash",
+      "description": "High-throughput, rapid iterations, and fast edit-test-debug loops.",
+      "supportsReasoning": false,
+      "supportsFastCoding": true,
+      "maxContextTokens": 1000000,
+      "tags": ["fast-loop", "qa-testing", "iterative"]
+    }
+  ]
+}
