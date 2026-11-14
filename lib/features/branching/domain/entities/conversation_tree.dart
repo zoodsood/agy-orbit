@@ -24,6 +24,7 @@ class BranchNode {
   int selectedChildIndex;
   final Map<String, dynamic> metadata;
   final String? diffContent;
+  final String? interactionId;
 
   BranchNode({
     required this.id,
@@ -40,6 +41,7 @@ class BranchNode {
     this.selectedChildIndex = 0,
     Map<String, dynamic>? metadata,
     this.diffContent,
+    this.interactionId,
   })  : timestamp = timestamp ?? DateTime.now(),
         childrenIds = childrenIds ?? [],
         metadata = metadata ?? {};
@@ -54,6 +56,7 @@ class BranchNode {
     int? selectedChildIndex,
     Map<String, dynamic>? metadata,
     String? diffContent,
+    String? interactionId,
   }) {
     return BranchNode(
       id: id,
@@ -70,6 +73,7 @@ class BranchNode {
       selectedChildIndex: selectedChildIndex ?? this.selectedChildIndex,
       metadata: metadata ?? Map.from(this.metadata),
       diffContent: diffContent ?? this.diffContent,
+      interactionId: interactionId ?? this.interactionId,
     );
   }
 

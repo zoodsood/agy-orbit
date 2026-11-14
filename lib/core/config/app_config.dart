@@ -11,6 +11,7 @@ class AppConfig {
   List<String> networkAllowlist;
   int requestTimeoutSeconds;
   int pollingIntervalSeconds;
+  bool enableVoiceDictation;
   Map<String, dynamic> customSettings;
 
   AppConfig({
@@ -21,6 +22,7 @@ class AppConfig {
     List<String>? networkAllowlist,
     this.requestTimeoutSeconds = 60,
     this.pollingIntervalSeconds = 3,
+    this.enableVoiceDictation = false,
     Map<String, dynamic>? customSettings,
   })  : networkAllowlist = networkAllowlist ?? ['*'],
         customSettings = customSettings ?? {};
@@ -66,6 +68,7 @@ class AppConfig {
       networkAllowlist: (api['networkAllowlist'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? ['*'],
       requestTimeoutSeconds: api['requestTimeoutSeconds'] as int? ?? 60,
       pollingIntervalSeconds: api['pollingIntervalSeconds'] as int? ?? 3,
+      enableVoiceDictation: api['enableVoiceDictation'] as bool? ?? false,
       customSettings: Map<String, dynamic>.from(json['customSettings'] as Map? ?? {}),
     );
   }
@@ -81,6 +84,7 @@ class AppConfig {
         'networkAllowlist': networkAllowlist,
         'requestTimeoutSeconds': requestTimeoutSeconds,
         'pollingIntervalSeconds': pollingIntervalSeconds,
+        'enableVoiceDictation': enableVoiceDictation,
       },
       'customSettings': customSettings,
     };
@@ -109,6 +113,7 @@ class AppConfig {
     List<String>? networkAllowlist,
     int? requestTimeoutSeconds,
     int? pollingIntervalSeconds,
+    bool? enableVoiceDictation,
     Map<String, dynamic>? customSettings,
   }) {
     if (controlPlaneBaseUrl != null) this.controlPlaneBaseUrl = controlPlaneBaseUrl;
@@ -118,6 +123,7 @@ class AppConfig {
     if (networkAllowlist != null) this.networkAllowlist = networkAllowlist;
     if (requestTimeoutSeconds != null) this.requestTimeoutSeconds = requestTimeoutSeconds;
     if (pollingIntervalSeconds != null) this.pollingIntervalSeconds = pollingIntervalSeconds;
+    if (enableVoiceDictation != null) this.enableVoiceDictation = enableVoiceDictation;
     if (customSettings != null) this.customSettings.addAll(customSettings);
   }
 }

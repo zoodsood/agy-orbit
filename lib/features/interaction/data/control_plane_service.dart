@@ -25,7 +25,7 @@ class ControlPlaneService {
       appConfig: appConfig,
     );
 
-    final uri = appConfig.buildControlPlaneUri('agents', queryParameters: {'key': apiKey});
+    final uri = appConfig.buildControlPlaneUri('agents');
 
     final response = await httpClient
         .post(
@@ -33,6 +33,7 @@ class ControlPlaneService {
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
+            'x-goog-api-key': apiKey,
           },
           body: jsonEncode(payload),
         )
@@ -52,11 +53,14 @@ class ControlPlaneService {
     required String agentId,
     required String apiKey,
   }) async {
-    final uri = appConfig.buildControlPlaneUri('agents/$agentId', queryParameters: {'key': apiKey});
+    final uri = appConfig.buildControlPlaneUri('agents/$agentId');
 
     final response = await httpClient.get(
       uri,
-      headers: {'Accept': 'application/json'},
+      headers: {
+        'Accept': 'application/json',
+        'x-goog-api-key': apiKey,
+      },
     ).timeout(Duration(seconds: appConfig.requestTimeoutSeconds));
 
     if (response.statusCode == 200) {
@@ -71,7 +75,10 @@ class ControlPlaneService {
     required String agentId,
     required String apiKey,
   }) async {
-    final uri = appConfig.buildControlPlaneUri('agents/$agentId', queryParameters: {'key': apiKey});
-    await httpClient.delete(uri);
+    final uri = appConfig.buildControlPlaneUri('agents/$agentId');
+    await httpClient.delete(
+      uri,
+      headers: {'x-goog-api-key': apiKey},
+    );
   }
 }

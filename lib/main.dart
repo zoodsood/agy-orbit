@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'core/platform/platform_io_stub.dart' if (dart.library.io) 'dart:io';
 import 'core/buffer/log_ring_buffer.dart';
 import 'core/config/app_config.dart';
 import 'core/config/model_descriptor.dart';
@@ -127,7 +129,6 @@ class _AntigravityManagerScreenState extends State<AntigravityManagerScreen>
     resourceGovernor = EnvironmentResourceGovernor();
 
     _branchVerifier = const RemoteBranchVerifier();
-    _telemetryService = ContainerTelemetryService();
     _tracePersistenceService = SessionTracePersistenceService();
 
     _activeInstructionTemplate = instructionRepository.getById('arch-flutter-senior');
@@ -164,27 +165,58 @@ class _AntigravityManagerScreenState extends State<AntigravityManagerScreen>
       ),
     ]);
 
+    _initializeEnvironments();
+    _telemetryService = ContainerTelemetryService(
+      httpClient: _httpClient,
+      appConfig: _appConfig,
+      environmentIdProvider: () =>
+          _environments.isNotEmpty ? _environments.first.id : null,
+      apiKeyProvider: () => _apiKey,
+    );
+
     controlPlaneService = ControlPlaneService(httpClient: _httpClient, appConfig: _appConfig);
-    dataPlaneService = DataPlaneService(httpClient: _httpClient, appConfig: _appConfig);
+    dataPlaneService = DataPlaneService(
+      httpClient: _httpClient,
+      appConfig: _appConfig,
+      telemetryService: _telemetryService,
+    );
     memoryBankService = MemoryBankService(httpClient: _httpClient, appConfig: _appConfig);
     syncService = AntigravitySyncService(httpClient: _httpClient, appConfig: _appConfig);
-
-    _initializeEnvironments();
     _initializeSession();
     _initializeConversationTree();
 
     heartbeatScheduler.start();
 
-    // Stream real live container telemetry from /proc/loadavg, /proc/meminfo, and df
+    // Stream server-side container telemetry & rate limits from the managed gVisor sandbox
     _telemetrySubscription = _telemetryService.streamTelemetry().listen((snapshot) {
-      if (mounted && _environments.isNotEmpty) {
+      if (mounted && _environments.isNotEmpty && snapshot.isFromRemote) {
         setState(() {
           final activeEnv = _environments.first;
+          final updatedMeta = Map<String, dynamic>.from(activeEnv.metadata);
+          if (snapshot.requestsRemaining != null ||
+              snapshot.requestsLimit != null ||
+              snapshot.tokensRemaining != null ||
+              snapshot.tokensLimit != null ||
+              snapshot.rateLimitResetAt != null) {
+            updatedMeta['rateLimits'] = {
+              if (snapshot.requestsRemaining != null)
+                'requestsRemaining': snapshot.requestsRemaining,
+              if (snapshot.requestsLimit != null)
+                'requestsLimit': snapshot.requestsLimit,
+              if (snapshot.tokensRemaining != null)
+                'tokensRemaining': snapshot.tokensRemaining,
+              if (snapshot.tokensLimit != null)
+                'tokensLimit': snapshot.tokensLimit,
+              if (snapshot.rateLimitResetAt != null)
+                'resetAt': snapshot.rateLimitResetAt,
+            };
+          }
           _environments[0] = activeEnv.copyWith(
             cpuUsagePercent: snapshot.cpuUsagePercent,
             memoryUsageMb: snapshot.memoryUsageMb,
             diskUsageMb: snapshot.diskUsageMb,
             lastActiveAt: DateTime.now(),
+            metadata: updatedMeta,
           );
         });
       }
@@ -620,17 +652,32 @@ class _AntigravityManagerScreenState extends State<AntigravityManagerScreen>
     );
   }
 
+  String _defaultLocalSyncPath() {
+    if (kIsWeb) return '/workspace';
+    if (Platform.isLinux && Directory('/workspace').existsSync()) {
+      return '/workspace';
+    }
+    if (Platform.isWindows) {
+      return Platform.environment['USERPROFILE'] ?? Directory.current.path;
+    }
+    if (Platform.isAndroid) {
+      return Directory.systemTemp.path;
+    }
+    return Platform.environment['HOME'] ?? Directory.systemTemp.path;
+  }
+
   void _triggerAntigravitySync() {
     if (_activeSession == null) return;
+    final localSyncPath = _defaultLocalSyncPath();
     showDialog(
       context: context,
       builder: (ctx) => SyncApprovalDialog(
         sessionId: _activeSession!.id,
         modifiedFiles: _remoteFiles.where((f) => f.relativePath.startsWith('output/')).toList(),
-        targetPath: '/workspace',
+        targetPath: localSyncPath,
         onApprove: () async {
           final syncResult = await syncService.downsyncWithResult(
-            targetParentPath: '/workspace',
+            targetParentPath: localSyncPath,
             sessionId: _activeSession!.id,
             filesToSync: _remoteFiles,
             apiKey: _apiKey ?? '',

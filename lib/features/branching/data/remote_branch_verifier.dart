@@ -1,4 +1,5 @@
-import 'dart:io';
+import '../../../core/platform/platform_io_stub.dart' if (dart.library.io) 'dart:io';
+import 'package:path/path.dart' as p;
 import '../domain/entities/conversation_tree.dart';
 
 /// Represents the status of a branch/worktree checkout in the Google Managed Sandbox.
@@ -51,9 +52,9 @@ class RemoteBranchVerifier {
   }) async {
     try {
       final targetDir = Directory(
-        workingDir.startsWith('/')
+        p.isAbsolute(workingDir)
             ? workingDir
-            : '$baseWorkspacePath/$workingDir',
+            : p.join(baseWorkspacePath, workingDir),
       );
 
       // 1. Check directory existence

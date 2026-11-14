@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+import '../../../core/platform/platform_io_stub.dart' if (dart.library.io) 'dart:io';
 import 'package:path/path.dart' as p;
 
 /// Entry in a durable session execution trace.
@@ -43,7 +43,10 @@ class SessionTracePersistenceService {
 
   SessionTracePersistenceService({
     String? baseStorageDirectory,
-  }) : baseStorageDirectory = baseStorageDirectory ?? '.orbit/sessions';
+  }) : baseStorageDirectory = baseStorageDirectory ??
+            ((Platform.isAndroid || Platform.isIOS)
+                ? p.join(Directory.systemTemp.path, '.orbit', 'sessions')
+                : '.orbit/sessions');
 
   /// Returns the trace file for a given session.
   File getTraceFile(String sessionId) {

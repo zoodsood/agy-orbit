@@ -82,12 +82,13 @@ class ModelRegistry extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final uri = appConfig.buildControlPlaneUri('models', queryParameters: {'key': apiKey});
+      final uri = appConfig.buildControlPlaneUri('models');
       final response = await _resilienceHandler.executeWithRetry(() => httpClient.get(
             uri,
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
+              'x-goog-api-key': apiKey,
             },
           ));
 

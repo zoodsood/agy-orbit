@@ -83,12 +83,14 @@ class MemoryBankService {
   }) async {
     final uri = appConfig.buildMemoryBankUri(
       'memoryBanks/sessions/$sessionId/timeline',
-      queryParameters: {'key': apiKey},
     );
 
     final response = await httpClient.get(
       uri,
-      headers: {'Accept': 'application/json'},
+      headers: {
+        'Accept': 'application/json',
+        'x-goog-api-key': apiKey,
+      },
     ).timeout(Duration(seconds: appConfig.requestTimeoutSeconds));
 
     if (response.statusCode == 200) {
@@ -111,7 +113,6 @@ class MemoryBankService {
     DateTime? sinceTimestamp,
   }) async {
     final queryParams = {
-      'key': apiKey,
       'sinceTurnId': lastTurnId,
       if (sinceTimestamp != null) 'sinceTime': sinceTimestamp.toIso8601String(),
     };
@@ -123,7 +124,10 @@ class MemoryBankService {
 
     final response = await httpClient.get(
       uri,
-      headers: {'Accept': 'application/json'},
+      headers: {
+        'Accept': 'application/json',
+        'x-goog-api-key': apiKey,
+      },
     ).timeout(Duration(seconds: appConfig.requestTimeoutSeconds));
 
     if (response.statusCode == 200) {
@@ -146,7 +150,6 @@ class MemoryBankService {
   }) async {
     final uri = appConfig.buildMemoryBankUri(
       'memoryBanks/sessions/$sessionId/checkpoints',
-      queryParameters: {'key': apiKey},
     );
 
     await httpClient.post(
@@ -154,6 +157,7 @@ class MemoryBankService {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'x-goog-api-key': apiKey,
       },
       body: jsonEncode({
         'turnId': turnId,

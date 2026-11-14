@@ -93,4 +93,22 @@ class McpConfigGenerator {
       }
     };
   }
+
+  /// Generates native Interactions API `tools` entries for remote MCP servers
+  /// (`type: 'mcp_server'`) directly from an [AgentManifest], eliminating custom
+  /// client-side MCP bridge boilerplate for remote HTTP/SSE MCP endpoints.
+  static List<Map<String, dynamic>> generateInteractionsTools(AgentManifest manifest) {
+    final List<Map<String, dynamic>> tools = [];
+    for (final server in manifest.mcpServers) {
+      if (server.url != null && server.url!.isNotEmpty) {
+        tools.add({
+          'type': 'mcp_server',
+          'name': server.name,
+          'url': server.url,
+          if (server.autoApprovedTools.isNotEmpty) 'allowed_tools': server.autoApprovedTools,
+        });
+      }
+    }
+    return tools;
+  }
 }

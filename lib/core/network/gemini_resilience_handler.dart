@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
+import '../platform/platform_io_stub.dart' if (dart.library.io) 'dart:io';
 import 'dart:math';
 import 'package:http/http.dart' as http;
 

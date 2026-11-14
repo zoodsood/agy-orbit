@@ -1,4 +1,4 @@
-import 'dart:io';
+import '../../../core/platform/platform_io_stub.dart' if (dart.library.io) 'dart:io';
 import 'package:path/path.dart' as p;
 import '../domain/entities/managed_environment.dart';
 

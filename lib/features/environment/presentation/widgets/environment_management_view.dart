@@ -277,6 +277,10 @@ class _EnvironmentManagementViewState extends State<EnvironmentManagementView> {
               ],
             ),
           ),
+          if (env.metadata['rateLimits'] is Map) ...[
+            const SizedBox(height: 8),
+            _buildRateLimitBanner(Map<String, dynamic>.from(env.metadata['rateLimits'] as Map)),
+          ],
           const SizedBox(height: 12),
 
           // Action Buttons
@@ -345,6 +349,49 @@ class _EnvironmentManagementViewState extends State<EnvironmentManagementView> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildRateLimitBanner(Map<String, dynamic> rateLimits) {
+    final reqRem = rateLimits['requestsRemaining'];
+    final reqLim = rateLimits['requestsLimit'];
+    final tokRem = rateLimits['tokensRemaining'];
+    final tokLim = rateLimits['tokensLimit'];
+    final resetAt = rateLimits['resetAt'];
+
+    final parts = <String>[];
+    if (reqRem != null) {
+      parts.add(reqLim != null ? 'Requests: $reqRem/$reqLim' : 'Requests left: $reqRem');
+    }
+    if (tokRem != null) {
+      parts.add(tokLim != null ? 'Tokens: $tokRem/$tokLim' : 'Tokens left: $tokRem');
+    }
+    if (resetAt != null) {
+      parts.add('Reset: $resetAt');
+    }
+    if (parts.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppTheme.terminalBlack,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: Colors.white12),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.speed, size: 14, color: AppTheme.geminiBlue),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'API Rate Limits — ${parts.join('  •  ')}',
+              style: const TextStyle(fontSize: 11, color: Colors.white70),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

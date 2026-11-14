@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+import '../../../core/platform/platform_io_stub.dart' if (dart.library.io) 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 import '../../../core/config/app_config.dart';
@@ -63,12 +63,14 @@ class AntigravitySyncService {
   }) async {
     final uri = appConfig.buildDataPlaneUri(
       'sessions/$sessionId/workspace/output',
-      queryParameters: {'key': apiKey},
     );
 
     final response = await httpClient.get(
       uri,
-      headers: {'Accept': 'application/json'},
+      headers: {
+        'Accept': 'application/json',
+        'x-goog-api-key': apiKey,
+      },
     ).timeout(Duration(seconds: appConfig.requestTimeoutSeconds));
 
     if (response.statusCode == 200) {
@@ -149,12 +151,14 @@ class AntigravitySyncService {
         final uri = appConfig.buildDataPlaneUri(
           'sessions/$sessionId/workspace/files',
           queryParameters: {
-            'key': apiKey,
             'path': file.relativePath,
           },
         );
 
-        final response = await httpClient.get(uri);
+        final response = await httpClient.get(
+          uri,
+          headers: {'x-goog-api-key': apiKey},
+        );
         if (response.statusCode == 200) {
           await localFile.writeAsBytes(response.bodyBytes);
         }
