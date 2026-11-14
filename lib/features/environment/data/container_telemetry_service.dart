@@ -398,9 +398,8 @@ class ContainerTelemetryService {
     controller = StreamController<ContainerTelemetrySnapshot>(
       onListen: () async {
         final first = await sampleTelemetry();
-        if (!cancelled && !controller.isClosed) {
-          controller.add(first);
-        }
+        if (cancelled || controller.isClosed) return;
+        controller.add(first);
         timer = Timer.periodic(interval, (_) async {
           if (cancelled || controller.isClosed) return;
           final snap = await sampleTelemetry();
