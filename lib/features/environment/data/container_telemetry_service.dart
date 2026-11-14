@@ -390,10 +390,35 @@ class ContainerTelemetryService {
   /// Creates a periodic stream of server-side telemetry snapshots.
   Stream<ContainerTelemetrySnapshot> streamTelemetry({
     Duration interval = const Duration(seconds: 5),
-  }) async* {
-    while (true) {
-      yield await sampleTelemetry();
-      await Future.delayed(interval);
-    }
+  }) {
+    late final StreamController<ContainerTelemetrySnapshot> controller;
+    Timer? timer;
+    var cancelled = false;
+
+    controller = StreamController<ContainerTelemetrySnapshot>(
+      onListen: () async {
+        final first = await sampleTelemetry();
+        if (!cancelled && !controller.isClosed) {
+          controller.add(first);
+        }
+        timer = Timer.periodic(interval, (_) async {
+          if (cancelled || controller.isClosed) return;
+          final snap = await sampleTelemetry();
+          if (!cancelled && !controller.isClosed) {
+            controller.add(snap);
+          }
+        });
+      },
+      onCancel: () {
+        cancelled = true;
+        timer?.cancel();
+        timer = null;
+        if (!controller.isClosed) {
+          controller.close();
+        }
+      },
+    );
+
+    return controller.stream;
   }
 }

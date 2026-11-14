@@ -935,10 +935,12 @@ class _AntigravityManagerScreenState extends State<AntigravityManagerScreen>
           children: [
             Icon(Icons.rocket_launch, color: AppTheme.accentCyan, size: 20),
             SizedBox(width: 8),
-            Text(
-              'Antigravity Orbit',
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
+            Flexible(
+              child: Text(
+                'Antigravity Orbit',
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
+              ),
             ),
           ],
         ),
