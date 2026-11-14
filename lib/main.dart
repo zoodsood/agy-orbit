@@ -3,7 +3,9 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import 'core/platform/platform_io_stub.dart' if (dart.library.io) 'dart:io';
+import 'dart:io'
+    if (dart.library.js_interop) 'core/platform/platform_io_stub.dart'
+    if (dart.library.html) 'core/platform/platform_io_stub.dart';
 import 'core/buffer/log_ring_buffer.dart';
 import 'core/config/app_config.dart';
 import 'core/config/model_descriptor.dart';

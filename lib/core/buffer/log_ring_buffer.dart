@@ -1,5 +1,7 @@
 import 'dart:collection';
-import '../platform/platform_io_stub.dart' if (dart.library.io) 'dart:io';
+import 'dart:io'
+    if (dart.library.js_interop) '../platform/platform_io_stub.dart'
+    if (dart.library.html) '../platform/platform_io_stub.dart';
 
 /// High-throughput, bounded circular FIFO buffer for streaming terminal logs.
 /// Prevents Out-Of-Memory (OOM) crashes on 1,000,000+ token runs by retaining

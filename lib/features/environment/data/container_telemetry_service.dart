@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../../core/config/app_config.dart';
-import '../../../core/platform/platform_io_stub.dart' if (dart.library.io) 'dart:io';
+import 'dart:io'
+    if (dart.library.js_interop) '../../../core/platform/platform_io_stub.dart'
+    if (dart.library.html) '../../../core/platform/platform_io_stub.dart';
 
 /// Gemini API rate-limit and token usage snapshot extracted from server response
 /// headers (`x-ratelimit-*`, `retry-after`) and `usage` metadata.

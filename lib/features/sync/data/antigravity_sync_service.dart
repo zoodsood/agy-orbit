@@ -1,5 +1,7 @@
 import 'dart:convert';
-import '../../../core/platform/platform_io_stub.dart' if (dart.library.io) 'dart:io';
+import 'dart:io'
+    if (dart.library.js_interop) '../../../core/platform/platform_io_stub.dart'
+    if (dart.library.html) '../../../core/platform/platform_io_stub.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 import '../../../core/config/app_config.dart';
