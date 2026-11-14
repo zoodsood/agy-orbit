@@ -947,19 +947,22 @@ class _AntigravityManagerScreenState extends State<AntigravityManagerScreen>
         actions: [
           // Active Instruction Chip
           if (_activeInstructionTemplate != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 130),
-                child: ActionChip(
-                  backgroundColor: AppTheme.surfaceElevated,
-                  avatar: const Icon(Icons.psychology, size: 14, color: AppTheme.accentCyan),
-                  label: Text(
-                    _activeInstructionTemplate!.title,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 10, color: Colors.white70),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 130),
+                  child: ActionChip(
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    backgroundColor: AppTheme.surfaceElevated,
+                    avatar: const Icon(Icons.psychology, size: 14, color: AppTheme.accentCyan),
+                    label: Text(
+                      _activeInstructionTemplate!.title,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 10, color: Colors.white70),
+                    ),
+                    onPressed: () => _tabController.animateTo(6), // Switch to Instructions tab
                   ),
-                  onPressed: () => _tabController.animateTo(6), // Switch to Instructions tab
                 ),
               ),
             ),
