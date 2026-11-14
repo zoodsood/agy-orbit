@@ -72,6 +72,13 @@ class ContainerTelemetrySnapshot {
   });
 
   bool get hasViolation => isCpuWarning || isMemoryWarning || isDiskWarning;
+  bool get isFromRemote => source == 'server';
+  int? get requestsRemaining => rateLimits?.rpmRemaining;
+  int? get requestsLimit => rateLimits?.rpmLimit;
+  int? get tokensRemaining => rateLimits?.tpmRemaining;
+  int? get tokensLimit => rateLimits?.tpmLimit;
+  String? get rateLimitResetAt =>
+      rateLimits?.retryAfterSeconds != null ? '${rateLimits!.retryAfterSeconds}s' : null;
 
   Map<String, dynamic> toJson() => {
         'timestamp': timestamp.toIso8601String(),
@@ -125,14 +132,14 @@ class ContainerTelemetryService {
 
   ContainerTelemetryService({
     this.workspacePath = '/workspace',
-    File? procLoadAvgFile,
-    File? procMemInfoFile,
+    Object? procLoadAvgFile,
+    Object? procMemInfoFile,
     http.Client? httpClient,
     AppConfig? appConfig,
     String? Function()? environmentIdProvider,
     String? Function()? apiKeyProvider,
-  })  : _procLoadAvgFile = procLoadAvgFile,
-        _procMemInfoFile = procMemInfoFile,
+  })  : _procLoadAvgFile = procLoadAvgFile as File?,
+        _procMemInfoFile = procMemInfoFile as File?,
         _httpClient = httpClient,
         _appConfig = appConfig,
         _environmentIdProvider = environmentIdProvider,

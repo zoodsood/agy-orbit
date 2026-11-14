@@ -381,7 +381,7 @@ class _EnvironmentManagementViewState extends State<EnvironmentManagementView> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.speed, size: 14, color: AppTheme.geminiBlue),
+          const Icon(Icons.speed, size: 14, color: AppTheme.primaryBlue),
           const SizedBox(width: 8),
           Expanded(
             child: Text(

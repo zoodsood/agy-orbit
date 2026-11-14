@@ -39,7 +39,7 @@ class AppTheme {
         error: statusFailed,
         onSurface: Color(0xFFC9D1D9),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: surface,
         elevation: 0,
         shape: RoundedRectangleBorder(

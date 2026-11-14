@@ -13,10 +13,10 @@ class LogRingBuffer {
 
   LogRingBuffer({
     this.capacity = 2000,
-    File? spoolFile,
+    Object? spoolFile,
   })  : assert(capacity > 0, 'Capacity must be greater than zero'),
         _buffer = Queue<String>(),
-        _spoolFile = spoolFile;
+        _spoolFile = spoolFile as File?;
 
   /// Returns the number of lines currently held in active memory.
   int get length => _buffer.length;
@@ -31,8 +31,8 @@ class LogRingBuffer {
   bool get isFull => _buffer.length >= capacity;
 
   /// Configures or updates the disk spooling target.
-  void setSpoolFile(File file) {
-    _spoolFile = file;
+  void setSpoolFile(Object file) {
+    _spoolFile = file as File;
   }
 
   /// Appends a single log line into the ring buffer.
